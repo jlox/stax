@@ -2,6 +2,8 @@ from display import *
 from matrix import *
 from draw import *
 
+stack = []
+
 ARG_COMMANDS = [ 'line', 'scale', 'translate', 'xrotate', 'yrotate', 'zrotate', 'circle', 'bezier', 'hermite', 'sphere', 'box', 'torus']
 
 def parse_file( f, points, transform, screen, color ):
@@ -43,11 +45,11 @@ def parse_file( f, points, transform, screen, color ):
 
             elif cmd == 'scale':
                 s = make_scale( args[0], args[1], args[2] )
-                matrix_mult( s, transform )
+                matrix_mult( s, stack[len(stack)-1] )
 
             elif cmd == 'translate':
                 t = make_translate( args[0], args[1], args[2] )
-                matrix_mult( t, transform )
+                matrix_mult( t, stack[len(stack)-1])
 
             else:
                 angle = args[0] * ( math.pi / 180 )
@@ -57,7 +59,7 @@ def parse_file( f, points, transform, screen, color ):
                     r = make_rotY( angle )
                 elif cmd == 'zrotate':
                     r = make_rotZ( angle )
-                matrix_mult( r, transform )
+                matrix_mult( r, stack[len(stack)-1] )
 
         elif cmd == 'ident':
             ident( transform )
@@ -68,7 +70,7 @@ def parse_file( f, points, transform, screen, color ):
         elif cmd == 'clear':
             points = []
 
-        elif cmd in ['display', 'save' ]:
+        elif cmd in ['display', 'save', 'push', 'pop' ]:
             screen = new_screen()
             draw_polygons( points, screen, color )
             
@@ -78,6 +80,13 @@ def parse_file( f, points, transform, screen, color ):
             elif cmd == 'save':
                 c+= 1
                 save_extension( screen, commands[c].strip() )
+
+            elif cmd == 'push':
+                stack.append(stack[len(stack)-1])
+
+            elif cmd == 'pop':
+                stack.pop()
+                
         elif cmd == 'quit':
             return    
         elif cmd[0] != '#':
