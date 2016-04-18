@@ -2,8 +2,10 @@ from display import *
 from matrix import *
 from draw import *
 
-stack=[]
-stack = ident(stack)
+stack = []
+start = new_matrix()
+ident(start)
+stack.append(start)
 
 ARG_COMMANDS = [ 'line', 'scale', 'translate', 'xrotate', 'yrotate', 'zrotate', 'circle', 'bezier', 'hermite', 'sphere', 'box', 'torus']
 
